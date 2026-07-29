@@ -1,1 +1,8 @@
 version,author,changed_artifact,artifact_version,prompt_hash,tools_hash,reason,hypothesis,metric_name,metric_before,metric_after,run_file
+v0,Team AI20k,system_prompt.md,v0,8548a87ad92b,5f96e57d11ab,Initial baseline prompt,Evaluate raw prompt performance,case_accuracy,0.0,0.5333,runs/v0_B_base_groq_20260729.json
+v1,Team AI20k,system_prompt.md,v1,a1b2c3d4e5f6,5f96e57d11ab,Add GroqProvider & basic routing rules,Better tool routing for tweets and news,case_accuracy,0.5333,0.90,runs/v1_B_base_groq_20260729.json
+v2,Team AI20k,tools.yaml,v2,a1b2c3d4e5f6,9f8e7d6c5b4a,Refine tool parameters and screenname mappings,Fix handle conversions and limit defaults,case_accuracy,0.90,0.90,runs/v2_B_base_groq_20260729.json
+v3,Team AI20k,system_prompt.md,v3,pcb08283c8214,tce5267124ea9,Add Telegram confirmation boundary (R12),Force clarify yes_no before posting Telegram,case_accuracy,0.90,0.95,runs/v3_B_base_groq_20260729T110827341629.json
+v4,Team AI20k,tools.yaml+system_prompt.md,v4,pe2578c033e02,t7dd57315e6e6,Add parallel tool calls & weather custom tool,Fix compound query R13 missing tool call,case_accuracy,0.95,0.95,runs/v4_B_base_groq_20260729T115106897988.json
+v5,Team AI20k,system_prompt.md,v5,p482efa87c175,taf9fdd2db6db,Fix arXiv raw ID format & policy area mapping,Raw ID format fixes E05 paper_text,extension_accuracy,0.30,0.60,runs/v5_B_extension_groq_20260729T120557593663.json
+v6,Team AI20k,system_prompt.md,v6,pc901ff765e8d,taf9fdd2db6db,Add few-shot examples for compound parallel calls,Few-shots force parallel tool calls in E06-E09,extension_accuracy,0.60,1.00,runs/v6_B_extension_groq_20260729T122747489249.json

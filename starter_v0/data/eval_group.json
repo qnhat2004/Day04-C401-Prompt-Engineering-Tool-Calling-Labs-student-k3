@@ -1,7 +1,277 @@
 {
   "dataset_id": "day04_v2_research_group",
   "dataset_role": "group",
-  "description": "Template để NHÓM tự viết đúng 10 case: 5 single-turn dùng query và 5 multi-turn dùng turns. Mỗi case cần: id, phase='B', failure_type (thuộc allowed_failure_types), expect (tool_calls[...] hoặc no_tool=true), và metadata.what_it_tests. File để trống có chủ đích vì mỗi nhóm phải tự thiết kế các case này.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "Bộ eval tự thiết kế của nhóm bao gồm 10 cases: 5 single-turn và 5 multi-turn, kiểm tra tool mới (weather), policy, arxiv papers và các tình huống ranh giới.",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "G01_weather_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Thời tiết Hà Nội hôm nay thế nào?",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "weather",
+            "args": {
+              "location": "Hanoi"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "custom_weather_routing",
+        "difficulty": "easy",
+        "what_it_tests": "Hỏi thời tiết thành phố cụ thể -> gọi tool mới weather với location=Hanoi."
+      }
+    },
+    {
+      "id": "G02_weather_missing_location",
+      "phase": "B",
+      "suite": "group",
+      "query": "Xem dự báo thời tiết hôm nay giúp mình",
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "clarify_missing_location",
+        "difficulty": "medium",
+        "what_it_tests": "Hỏi thời tiết nhưng thiếu địa điểm -> gọi clarify xin location, không đoán bừa."
+      }
+    },
+    {
+      "id": "G03_policy_search_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Quy định xuất bản tài liệu ra bên ngoài của công ty là gì?",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "policy",
+            "args": {
+              "query": "xuất bản tài liệu",
+              "policy_area": "external_publishing"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "policy_search_routing",
+        "difficulty": "medium",
+        "what_it_tests": "Tra cứu chính sách công ty về xuất bản -> gọi policy với policy_area=external_publishing."
+      }
+    },
+    {
+      "id": "G04_papers_arxiv_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tìm cho mình 3 bài báo mới nhất về LLM Agent trên arXiv",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "papers",
+            "args": {
+              "query": "LLM Agent",
+              "max_results": 3
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "arxiv_papers_routing",
+        "difficulty": "easy",
+        "what_it_tests": "Tìm bài báo khoa học arXiv -> gọi papers với max_results=3."
+      }
+    },
+    {
+      "id": "G05_out_of_scope_cooking",
+      "phase": "B",
+      "suite": "group",
+      "query": "Hướng dẫn mình công thức nấu món phở bò Hà Nội chuẩn vị",
+      "failure_type": "out_of_scope",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "metadata": {
+        "skill": "out_of_scope_cooking",
+        "difficulty": "easy",
+        "what_it_tests": "Hướng dẫn nấu ăn ngoài phạm vi research/news -> no_tool=true."
+      }
+    },
+    {
+      "id": "G06_multiturn_weather_clarify",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Thời tiết hôm nay thế nào?"
+        },
+        {
+          "role": "user",
+          "content": "Ở thành phố Đà Nẵng nhé"
+        }
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "weather",
+            "args": {
+              "location": "Danang"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_weather_fill",
+        "difficulty": "medium",
+        "what_it_tests": "Multi-turn: lượt 1 thiếu location, lượt 2 bổ sung Đà Nẵng -> gọi weather với location=Danang."
+      }
+    },
+    {
+      "id": "G07_multiturn_paper_text",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tìm bài báo khoa học về Transformer"
+        },
+        {
+          "role": "user",
+          "content": "Đọc cho mình bài có id 1706.03762"
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "paper_text",
+            "args": {
+              "arxiv_url": "1706.03762"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_switch_to_paper_text",
+        "difficulty": "medium",
+        "what_it_tests": "Multi-turn: lượt 1 tìm kiếm, lượt 2 yêu cầu đọc toàn văn ID 1706.03762 -> gọi paper_text."
+      }
+    },
+    {
+      "id": "G08_multiturn_weather_correction",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Thời tiết ở Tokyo hôm nay thế nào?"
+        },
+        {
+          "role": "user",
+          "content": "À thôi xem thời tiết ở Osaka đi"
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "weather",
+            "args": {
+              "location": "Osaka"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_location_correction",
+        "difficulty": "hard",
+        "what_it_tests": "Multi-turn: người dùng sửa địa điểm từ Tokyo thành Osaka -> gọi weather với location=Osaka."
+      }
+    },
+    {
+      "id": "G09_multiturn_policy_clarify",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Chính sách bảo mật dữ liệu của công ty như thế nào?"
+        },
+        {
+          "role": "user",
+          "content": "Chỉ xem các mục liên quan đến data privacy thôi"
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "policy",
+            "args": {
+              "query": "bảo mật dữ liệu",
+              "policy_area": "data_privacy"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_policy_area",
+        "difficulty": "hard",
+        "what_it_tests": "Multi-turn: lượt 2 chọn khu vực policy_area=data_privacy."
+      }
+    },
+    {
+      "id": "G10_multiturn_telegram_confirm",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Soạn bản tin tổng hợp thời tiết Hà Nội"
+        },
+        {
+          "role": "user",
+          "content": "Gửi bản tin vừa xong lên kênh Telegram giúp mình"
+        }
+      ],
+      "failure_type": "wrong_boundary",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "skill": "multiturn_confirm_telegram",
+        "difficulty": "hard",
+        "what_it_tests": "Multi-turn: lượt 2 yêu cầu gửi Telegram -> xin xác nhận yes_no bằng clarify."
+      }
+    }
+  ]
 }

@@ -76,7 +76,7 @@ class GeminiProvider:
         default_model: str = "gemini-3.5-flash",
     ) -> None:
         self.api_key_env = api_key_env
-        self.default_model = default_model
+        self.default_model = "gemini-2.0-flash"
 
     def complete(
         self,
@@ -105,12 +105,28 @@ class GeminiProvider:
         if declarations:
             config_kwargs["tools"] = [types.Tool(function_declarations=declarations)]
 
+        import time
         client = genai.Client(api_key=api_key)
-        resp = client.models.generate_content(
-            model=model or self.default_model,
-            contents=contents,
-            config=types.GenerateContentConfig(**config_kwargs),
-        )
+
+        max_retries = 5
+        resp = None
+        for attempt in range(max_retries):
+            try:
+                resp = client.models.generate_content(
+                    model=model or self.default_model,
+                    contents=contents,
+                    config=types.GenerateContentConfig(**config_kwargs),
+                )
+                break
+            except Exception as exc:
+                err_str = str(exc)
+                if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str or "quota" in err_str.lower():
+                    if attempt < max_retries - 1:
+                        sleep_sec = 5 * (attempt + 1)
+                        print(f"[Gemini 429 Rate Limit] Pausing {sleep_sec}s before retry {attempt + 1}/{max_retries}...", flush=True)
+                        time.sleep(sleep_sec)
+                        continue
+                raise exc
 
         text_parts: list[str] = []
         calls: list[ToolCall] = []

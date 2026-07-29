@@ -264,7 +264,7 @@ def main() -> None:
     parser.add_argument("--phase", choices=["B"], default="B")
     parser.add_argument("--suite", choices=["base", "group", "cross", "extension"], default="base", help="Run label saved to JSON; does not filter --eval-cases.")
     parser.add_argument("--version", required=True)
-    parser.add_argument("--provider", choices=["openai", "openrouter", "anthropic", "gemini"], required=True)
+    parser.add_argument("--provider", choices=["openai", "openrouter", "anthropic", "gemini", "groq", "cerebras"], required=True)
     parser.add_argument("--model", default=None)
     parser.add_argument("--system-prompt", type=Path, default=ARTIFACTS_DIR / "system_prompt.md")
     parser.add_argument("--tools", type=Path, default=ARTIFACTS_DIR / "tools.yaml")
@@ -285,8 +285,10 @@ def main() -> None:
     validate_expected_tools(cases, tool_declarations, args.eval_cases)
     openai_tools = to_openai_tools(tool_declarations)
 
+    import time
     results: list[dict[str, Any]] = []
     for case in cases:
+        time.sleep(1.5)
         print(f"Running {case['id']}...", flush=True)
         agent = ResearchAgent(provider, system_prompt=system_prompt, tools=openai_tools, model=args.model)
         try:
