@@ -84,12 +84,20 @@ def run_model_tool_loop(
     tools: list[dict[str, Any]],
     model: str | None,
     max_tool_rounds: int,
+    stop_callback: Any | None = None,
 ) -> dict[str, Any]:
     working_messages = list(messages)
     rounds: list[dict[str, Any]] = []
     all_tool_events: list[dict[str, Any]] = []
 
     for round_index in range(1, max_tool_rounds + 1):
+        if stop_callback and stop_callback():
+            return {
+                "status": "interrupted",
+                "assistant_text": "🛑 Execution stopped by user.",
+                "rounds": rounds,
+                "tool_events": all_tool_events,
+            }
         response = provider.complete(working_messages, tools, model=model, temperature=0.0)
         calls = response.tool_calls
         round_record: dict[str, Any] = {
