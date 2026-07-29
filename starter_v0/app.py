@@ -21,13 +21,13 @@ RUNS_DIR = ROOT / "runs"
 load_lab_env(ROOT)
 
 st.set_page_config(
-    page_title="AI Research Agent — Workspace Canvas & Execution Pipeline",
+    page_title="AI Research Agent — Perplexity Canvas",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# Custom Inject CSS for Light Glassmorphism Theme
+# Custom Inject CSS for Perplexity Light Glassmorphism Theme
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -44,14 +44,14 @@ html, body, [class*="css"] {
 
 /* Glassmorphic Light Cards */
 .glass-card {
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
-    border: 1px solid rgba(203, 213, 225, 0.8) !important;
-    border-radius: 16px !important;
-    padding: 20px !important;
-    margin: 12px 0px !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    border-radius: 14px !important;
+    padding: 14px !important;
+    margin: 8px 0px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
 }
 
 .glass-badge {
@@ -71,19 +71,19 @@ html, body, [class*="css"] {
     align-items: center;
     gap: 12px;
     overflow-x: auto;
-    padding: 16px;
+    padding: 14px;
     background: #ffffff;
-    border-radius: 16px;
+    border-radius: 14px;
     border: 1px solid #e2e8f0;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .node-item {
     background: #f8fafc;
     border: 1px solid #cbd5e1;
-    border-radius: 12px;
-    padding: 12px 18px;
+    border-radius: 10px;
+    padding: 10px 16px;
     color: #334155;
     font-weight: 600;
     font-size: 13px;
@@ -105,12 +105,21 @@ html, body, [class*="css"] {
 
 /* Weather Widget Card */
 .weather-card {
-    background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-    border-radius: 16px;
-    padding: 20px;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border-radius: 14px;
+    padding: 18px;
     color: white;
     margin: 10px 0;
-    box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4);
+    box-shadow: 0 10px 20px -5px rgba(2, 132, 199, 0.3);
+}
+
+/* Perplexity Step Expander Styling */
+div[data-testid="stExpander"] {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+    margin-bottom: 12px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -119,7 +128,7 @@ html, body, [class*="css"] {
 col_title, col_status = st.columns([3, 1])
 with col_title:
     st.markdown("<h1 style='color: #0f172a; font-weight: 800;'>⚡ Next-Gen AI Agent Workspace</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #475569; font-size: 15px;'>Real-time Tool Calling, Visual Pipeline Execution Graph & Multi-Model Canvas</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #475569; font-size: 15px;'>Perplexity-style Live Tool Canvas & Multi-Model Execution Trace</p>", unsafe_allow_html=True)
 
 with col_status:
     st.markdown("""
@@ -158,9 +167,9 @@ if system_prompt_path.exists() and tools_path.exists():
     st.sidebar.subheader("📦 Artifact Metadata")
     st.sidebar.markdown(f"""
     <div class='glass-card' style='padding: 12px;'>
-        <div style='font-size: 13px; color: #38bdf8; font-weight: bold;'>VERSION {art_ver.artifact_version}</div>
-        <div style='font-size: 11px; color: #94a3b8; margin-top: 4px;'>Prompt Hash: {art_ver.prompt_hash[:12]}...</div>
-        <div style='font-size: 11px; color: #94a3b8;'>Tools Hash: {art_ver.tools_hash[:12]}...</div>
+        <div style='font-size: 13px; color: #2563eb; font-weight: bold;'>VERSION {art_ver.artifact_version}</div>
+        <div style='font-size: 11px; color: #64748b; margin-top: 4px;'>Prompt Hash: {art_ver.prompt_hash[:12]}...</div>
+        <div style='font-size: 11px; color: #64748b;'>Tools Hash: {art_ver.tools_hash[:12]}...</div>
     </div>
     """, unsafe_allow_html=True)
 else:
@@ -193,49 +202,105 @@ def render_pipeline_graph(rounds: list[dict[str, Any]]) -> None:
             nodes_html.append(f"<div class='node-item'>🧠 Round {round_num}: Thinking</div>")
 
     nodes_html.append("<div class='node-arrow'>➔</div>")
-    nodes_html.append("<div class='node-item' style='border-color: #4ade80; color: #4ade80;'>✨ Final Digest</div>")
+    nodes_html.append("<div class='node-item' style='border-color: #16a34a; color: #16a34a;'>✨ Final Digest</div>")
     nodes_html.append("</div>")
     st.markdown("".join(nodes_html), unsafe_allow_html=True)
 
 
-def render_visual_trace(rounds: list[dict[str, Any]]) -> None:
-    """Hiển thị suy luận & các thẻ widget trực quan."""
-    render_pipeline_graph(rounds)
+def render_perplexity_style_trace(rounds: list[dict[str, Any]]) -> None:
+    """Render Perplexity AI style sources & expandable Completed N steps component."""
+    if not rounds:
+        return
 
+    all_calls = []
+    all_results = []
     for rnd in rounds:
-        round_num = rnd.get("round", 1)
-        st.markdown(f"#### 🔄 Round {round_num} Pipeline Steps")
+        for call in rnd.get("tool_calls", []):
+            all_calls.append(call)
+        for res in rnd.get("tool_results", []):
+            all_results.append(res)
 
-        assistant_thought = rnd.get("assistant_text")
-        if assistant_thought:
-            st.markdown("**🧠 Assistant Reasoning / Plan:**")
-            st.info(assistant_thought)
+    total_steps = len(all_calls)
 
-        tool_calls = rnd.get("tool_calls", [])
-        tool_results = rnd.get("tool_results", [])
+    # 1. Render Sources Grid (Perplexity style source cards at top)
+    sources = []
+    for res_item in all_results:
+        res = res_item.get("result", {})
+        if isinstance(res, dict):
+            if "items" in res and isinstance(res["items"], list):
+                for item in res["items"][:4]:
+                    if isinstance(item, dict):
+                        sources.append({
+                            "title": item.get("title") or item.get("topic") or item.get("author") or "Web Article",
+                            "url": item.get("url") or item.get("link") or "#",
+                            "snippet": item.get("snippet") or item.get("text") or item.get("summary") or "",
+                            "domain": item.get("domain") or "web"
+                        })
+            elif "location" in res:
+                sources.append({
+                    "title": f"Live Weather: {res.get('location')}",
+                    "url": "#",
+                    "snippet": f"{res.get('temperature')}°C - Wind: {res.get('windspeed')} km/h",
+                    "domain": "open-meteo.com"
+                })
 
-        if tool_calls:
+    if sources:
+        st.markdown("<div style='font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px; letter-spacing: 0.5px;'>SOURCES & REFERENCES</div>", unsafe_allow_html=True)
+        cols = st.columns(min(len(sources), 3))
+        for idx, src in enumerate(sources[:3]):
+            with cols[idx % 3]:
+                st.markdown(f"""
+                <div class='glass-card' style='padding: 10px 14px;'>
+                    <div style='font-size: 11px; color: #2563eb; font-weight: 700;'>🌐 {src['domain']}</div>
+                    <div style='font-size: 13px; font-weight: 700; color: #0f172a; margin: 2px 0; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;'>
+                        <a href="{src['url']}" target="_blank" style="color: inherit; text-decoration: none;">{src['title']}</a>
+                    </div>
+                    <div style='font-size: 11px; color: #64748b; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;'>{src['snippet']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+
+    # 2. Render Collapsible "Completed X steps >" expander (Perplexity UI)
+    step_label = f"Completed {total_steps} step{'s' if total_steps != 1 else ''} ›" if total_steps > 0 else "Completed 1 step ›"
+    
+    with st.expander(step_label, expanded=False):
+        for rnd in rounds:
+            round_num = rnd.get("round", 1)
+            tool_calls = rnd.get("tool_calls", [])
+            tool_results = rnd.get("tool_results", [])
+            
             for idx, call in enumerate(tool_calls):
                 tool_name = call.get("name")
                 args = call.get("args", {})
-                matching_res = tool_results[idx].get("result", {}) if idx < len(tool_results) else None
+                res = tool_results[idx].get("result", {}) if idx < len(tool_results) else {}
 
-                # Visual Custom Widget for Weather Tool
-                if tool_name == "weather" and matching_res and "temperature" in matching_res:
-                    loc = matching_res.get("location", args.get("location", "City"))
-                    temp = matching_res.get("temperature", "--")
-                    wind = matching_res.get("windspeed", "--")
-                    unit = matching_res.get("unit", "°C")
-                    st.markdown(f"""
-                    <div class='weather-card'>
-                        <div style='font-size: 14px; text-transform: uppercase; letter-spacing: 1px;'>🌤️ LIVE WEATHER WIDGET — {loc}</div>
-                        <div style='font-size: 36px; font-weight: 800; margin: 8px 0;'>{temp} {unit}</div>
-                        <div style='font-size: 13px; opacity: 0.9;'>Wind Speed: {wind} km/h</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                icon = "🌐"
+                label = "Searching the web"
+                if tool_name in ["papers", "paper_text"]:
+                    icon = "📚"
+                    label = "Researching arXiv papers"
+                elif tool_name == "weather":
+                    icon = "🌤️"
+                    label = "Fetching weather forecast"
+                elif tool_name == "policy":
+                    icon = "🔒"
+                    label = "Checking company policy RAG"
+                elif tool_name in ["timeline", "social_search"]:
+                    icon = "🐦"
+                    label = "Searching Twitter / X posts"
+                elif tool_name == "clarify":
+                    icon = "💬"
+                    label = "Requesting user clarification"
 
-                with st.status(f"Tool `{tool_name}` — Query: `{json.dumps(args, ensure_ascii=False)}`", state="complete" if matching_res else "running"):
-                    st.json({"tool": tool_name, "args": args, "output": matching_res})
+                st.markdown(f"**{icon} {label}**")
+                query_val = args.get("query") or args.get("location") or args.get("topic") or args.get("policy_area") or json.dumps(args, ensure_ascii=False)
+                st.markdown(f"- 🔍 `Query:` *{query_val}*")
+                
+                if isinstance(res, dict) and "items" in res and isinstance(res["items"], list):
+                    for sub_item in res["items"][:3]:
+                        if isinstance(sub_item, dict):
+                            item_title = sub_item.get("title") or sub_item.get("author") or "Item"
+                            item_domain = sub_item.get("domain") or sub_item.get("url") or ""
+                            st.markdown(f"  - 📄 `{item_title}` *( {item_domain} )*")
 
 
 tab1, tab2, tab3 = st.tabs(["💬 Interactive Chat & Pipeline Canvas", "⚡ Side-by-Side Model Comparison", "📂 Run Inspector"])
@@ -254,15 +319,17 @@ with tab1:
 
         for msg in st.session_state.messages:
             with st.chat_message(msg["role"]):
+                if "trace" in msg:
+                    render_perplexity_style_trace(msg["trace"])
                 st.markdown(msg["content"])
 
-        if user_prompt := st.chat_input("Ask anything (e.g. 'Thời tiết Hà Nội hôm nay', 'Tìm paper AI Agents')..."):
+        if user_prompt := st.chat_input("Ask anything (e.g. 'Thời tiết Hà Nội hôm nay', 'Tìm paper Attention Is All You Need')..."):
             st.session_state.messages.append({"role": "user", "content": user_prompt})
             with st.chat_message("user"):
                 st.markdown(user_prompt)
 
             with st.chat_message("assistant"):
-                with st.spinner("🤖 Executing Agent & Calling Tools..."):
+                with st.spinner("🤖 Searching & Reasoning..."):
                     try:
                         system_prompt = system_prompt_path.read_text(encoding="utf-8")
                         tool_declarations = load_tool_declarations(tools_path)
@@ -285,7 +352,11 @@ with tab1:
                         )
 
                         assistant_text = result.get("assistant_text", "")
+                        
+                        # Render Perplexity AI style trace right above the answer!
+                        render_perplexity_style_trace(result["rounds"])
                         st.markdown(assistant_text)
+                        
                         st.session_state.last_result = result
 
                         st.session_state.messages.append({
@@ -303,7 +374,8 @@ with tab1:
     with col_right:
         st.subheader("🎨 Real-time Execution Canvas & Artifact Preview")
         if st.session_state.last_result:
-            render_visual_trace(st.session_state.last_result["rounds"])
+            render_pipeline_graph(st.session_state.last_result["rounds"])
+            render_perplexity_style_trace(st.session_state.last_result["rounds"])
             st.markdown("---")
             st.subheader("📄 Generated Content Output")
             st.markdown(st.session_state.last_result.get("assistant_text", ""))
@@ -337,8 +409,8 @@ with tab2:
                 res_a = run_model_tool_loop(provider=provider, messages=input_msgs, tools=openai_tools, model=model_a, max_tool_rounds=4)
                 dt_a = (datetime.now() - t0).total_seconds()
                 st.success(f"Execution Time: {dt_a:.2f}s | Status: {res_a['status']}")
+                render_perplexity_style_trace(res_a["rounds"])
                 st.markdown(res_a["assistant_text"])
-                st.json(res_a["rounds"])
 
         with col_res2:
             st.markdown(f"### 🤖 Model B: `{model_b}`")
@@ -347,8 +419,8 @@ with tab2:
                 res_b = run_model_tool_loop(provider=provider, messages=input_msgs, tools=openai_tools, model=model_b, max_tool_rounds=4)
                 dt_b = (datetime.now() - t0).total_seconds()
                 st.success(f"Execution Time: {dt_b:.2f}s | Status: {res_b['status']}")
+                render_perplexity_style_trace(res_b["rounds"])
                 st.markdown(res_b["assistant_text"])
-                st.json(res_b["rounds"])
 
 with tab3:
     st.subheader("📂 Inspect Evaluation Runs & Transcripts")
