@@ -27,7 +27,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom Inject CSS for Glassmorphism & Cyberpunk Neon Theme
+# Custom Inject CSS for Light Glassmorphism Theme
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -36,28 +36,28 @@ html, body, [class*="css"] {
     font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-/* Main background gradient */
+/* Main background light gradient */
 .stApp {
-    background: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #111827 100%) !important;
-    color: #f8fafc !important;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%) !important;
+    color: #0f172a !important;
 }
 
-/* Glassmorphic Cards */
+/* Glassmorphic Light Cards */
 .glass-card {
-    background: rgba(30, 41, 59, 0.65) !important;
+    background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(203, 213, 225, 0.8) !important;
     border-radius: 16px !important;
     padding: 20px !important;
     margin: 12px 0px !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
 }
 
 .glass-badge {
-    background: rgba(56, 189, 248, 0.15);
-    border: 1px solid #38bdf8;
-    color: #38bdf8;
+    background: rgba(37, 99, 235, 0.1);
+    border: 1px solid #2563eb;
+    color: #2563eb;
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 12px;
@@ -65,51 +65,52 @@ html, body, [class*="css"] {
     display: inline-block;
 }
 
-/* Pipeline Node Graph */
+/* Pipeline Node Graph - Light Theme */
 .pipeline-container {
     display: flex;
     align-items: center;
     gap: 12px;
     overflow-x: auto;
     padding: 16px;
-    background: rgba(15, 23, 42, 0.8);
+    background: #ffffff;
     border-radius: 16px;
-    border: 1px solid rgba(56, 189, 248, 0.2);
+    border: 1px solid #e2e8f0;
     margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .node-item {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border: 1px solid #38bdf8;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
     border-radius: 12px;
     padding: 12px 18px;
-    color: #e2e8f0;
+    color: #334155;
     font-weight: 600;
     font-size: 13px;
-    box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
     white-space: nowrap;
 }
 
 .node-item.active {
-    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-    border-color: #38bdf8;
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border-color: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
 .node-arrow {
-    color: #64748b;
+    color: #94a3b8;
     font-weight: bold;
     font-size: 16px;
 }
 
 /* Weather Widget Card */
 .weather-card {
-    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
     border-radius: 16px;
     padding: 20px;
     color: white;
     margin: 10px 0;
-    box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.5);
+    box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -117,8 +118,8 @@ html, body, [class*="css"] {
 # Header Section
 col_title, col_status = st.columns([3, 1])
 with col_title:
-    st.markdown("<h1 style='color: #f8fafc; font-weight: 800;'>⚡ Next-Gen AI Agent Workspace</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #94a3b8; font-size: 15px;'>Real-time Tool Calling, Visual Pipeline Execution Graph & Multi-Model Canvas</p>", unsafe_allow_html=True)
+    st.markdown("<h1 style='color: #0f172a; font-weight: 800;'>⚡ Next-Gen AI Agent Workspace</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #475569; font-size: 15px;'>Real-time Tool Calling, Visual Pipeline Execution Graph & Multi-Model Canvas</p>", unsafe_allow_html=True)
 
 with col_status:
     st.markdown("""
