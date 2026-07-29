@@ -140,11 +140,6 @@ with col_status:
 # Sidebar Configuration
 st.sidebar.header("⚙️ Agent & Model Hub")
 
-if st.sidebar.button("🛑 Stop Generation", use_container_width=True, help="Immediately interrupt agent execution"):
-    st.session_state["stop_signal"] = True
-    st.toast("🛑 Generation stopped by user!")
-    st.stop()
-
 provider_name = st.sidebar.selectbox(
     "Select Provider",
     ["groq", "gemini", "openai", "openrouter", "cerebras"],
@@ -314,14 +309,7 @@ with tab1:
     col_left, col_right = st.columns([1, 1])
 
     with col_left:
-        c_title, c_btn = st.columns([3, 1])
-        with c_title:
-            st.subheader("💬 Chat & Query Input")
-        with c_btn:
-            if st.button("🛑 Stop", key="stop_top_btn", help="Interrupt generation"):
-                st.session_state["stop_signal"] = True
-                st.toast("🛑 Generation stopped!")
-                st.stop()
+        st.subheader("💬 Chat & Query Input")
 
         if "messages" not in st.session_state:
             st.session_state.messages = []
@@ -337,7 +325,6 @@ with tab1:
                 st.markdown(msg["content"])
 
         if user_prompt := st.chat_input("Ask anything (e.g. 'Thời tiết Hà Nội hôm nay', 'Tìm paper Attention Is All You Need')..."):
-            st.session_state["stop_signal"] = False
             st.session_state.messages.append({"role": "user", "content": user_prompt})
             with st.chat_message("user"):
                 st.markdown(user_prompt)
@@ -363,7 +350,6 @@ with tab1:
                             tools=openai_tools,
                             model=model_to_use,
                             max_tool_rounds=4,
-                            stop_callback=lambda: st.session_state.get("stop_signal", False),
                         )
 
                         assistant_text = result.get("assistant_text", "")
