@@ -330,7 +330,7 @@ with tab1:
                 st.markdown(user_prompt)
 
             with st.chat_message("assistant"):
-                with st.spinner("🤖 Searching & Reasoning..."):
+                with st.status("🤖 Agent is initializing...", expanded=True) as status_box:
                     try:
                         system_prompt = system_prompt_path.read_text(encoding="utf-8")
                         tool_declarations = load_tool_declarations(tools_path)
@@ -344,17 +344,22 @@ with tab1:
                             {"role": "user", "content": user_prompt},
                         ]
 
+                        def update_live_status(msg: str):
+                            status_box.update(label=msg, state="running")
+                            st.write(msg)
+
                         result = run_model_tool_loop(
                             provider=provider,
                             messages=input_messages,
                             tools=openai_tools,
                             model=model_to_use,
                             max_tool_rounds=4,
+                            status_callback=update_live_status,
                         )
 
+                        status_box.update(label="✨ Finished execution & synthesis!", state="complete")
+
                         assistant_text = result.get("assistant_text", "")
-                        
-                        # Render Perplexity AI style trace right above the answer!
                         render_perplexity_style_trace(result["rounds"])
                         st.markdown(assistant_text)
                         

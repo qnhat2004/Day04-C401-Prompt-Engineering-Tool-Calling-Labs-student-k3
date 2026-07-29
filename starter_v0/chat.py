@@ -85,6 +85,7 @@ def run_model_tool_loop(
     model: str | None,
     max_tool_rounds: int,
     stop_callback: Any | None = None,
+    status_callback: Any | None = None,
 ) -> dict[str, Any]:
     working_messages = list(messages)
     rounds: list[dict[str, Any]] = []
@@ -98,6 +99,10 @@ def run_model_tool_loop(
                 "rounds": rounds,
                 "tool_events": all_tool_events,
             }
+        
+        if status_callback:
+            status_callback(f"🧠 Round {round_index}: Agent is thinking & reasoning...")
+
         response = provider.complete(working_messages, tools, model=model, temperature=0.0)
         calls = response.tool_calls
         round_record: dict[str, Any] = {
@@ -109,6 +114,8 @@ def run_model_tool_loop(
 
         if not calls:
             rounds.append(round_record)
+            if status_callback:
+                status_callback("✨ Synthesizing final response...")
             return {
                 "status": "answered",
                 "assistant_text": response.text or "",
@@ -120,7 +127,11 @@ def run_model_tool_loop(
         non_clarification_events: list[dict[str, Any]] = []
 
         for call in calls:
+            tool_msg = f"🛠️ Executing Tool `{call.name}` ({json.dumps(call.args, ensure_ascii=False)})"
             print(f"🔧 {call.name}({json.dumps(call.args, ensure_ascii=False, sort_keys=True)})")
+            if status_callback:
+                status_callback(tool_msg)
+
             event = execute_tool_call(call)
             round_record["tool_results"].append(event)
             all_tool_events.append(event)
