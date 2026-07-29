@@ -141,7 +141,7 @@ provider_models = {
     "groq": ["llama-3.1-8b-instant", "openai/gpt-oss-20b", "openai/gpt-oss-120b", "llama-3.3-70b-versatile"],
     "gemini": ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-1.5-flash"],
     "openai": ["gpt-4o-mini", "gpt-4o"],
-    "openrouter": ["openai/gpt-oss-20b:free", "openai/gpt-oss-20b", "meta-llama/llama-3.1-8b-instruct", "openai/gpt-4o-mini"],
+    "openrouter": ["inclusionai/ling-3.0-flash:free", "openai/gpt-oss-20b:free", "openai/gpt-oss-20b", "meta-llama/llama-3.1-8b-instruct", "openai/gpt-4o-mini"],
     "cerebras": ["llama3.1-8b", "llama3.1-70b"],
 }
 
