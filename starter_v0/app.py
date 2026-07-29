@@ -383,9 +383,11 @@ with tab1:
         else:
             st.info("Submit a query in the chat window to view the visual execution pipeline graph and live artifact preview.")
 
+import concurrent.futures
+
 with tab2:
-    st.subheader("⚡ Side-by-Side Model Comparison (A/B Testing Matrix)")
-    st.caption("Compare 2 different models or providers on the exact same query in real-time.")
+    st.subheader("⚡ Side-by-Side Model Comparison (Parallel A/B Benchmark)")
+    st.caption("Compare 2 different models or providers running in parallel threads on the exact same query.")
 
     comp_col1, comp_col2 = st.columns(2)
     with comp_col1:
@@ -395,33 +397,50 @@ with tab2:
 
     compare_prompt = st.text_input("Comparison Query Input:", value="Thời tiết Hà Nội hôm nay và quy định công ty về báo cáo.")
 
-    if st.button("🚀 Run Comparison Benchmark"):
-        col_res1, col_res2 = st.columns(2)
+    if st.button("🚀 Run Parallel Benchmark"):
         system_prompt = system_prompt_path.read_text(encoding="utf-8")
         tool_declarations = load_tool_declarations(tools_path)
         openai_tools = to_openai_tools(tool_declarations)
         provider = make_provider(provider_name)
         input_msgs = [{"role": "system", "content": system_prompt}, {"role": "user", "content": compare_prompt}]
 
+        with st.spinner(f"⚡ Running Model A (`{model_a}`) and Model B (`{model_b}`) concurrently in parallel threads..."):
+            t0 = datetime.now()
+
+            def run_a():
+                t_start = datetime.now()
+                res = run_model_tool_loop(provider=provider, messages=input_msgs, tools=openai_tools, model=model_a, max_tool_rounds=4)
+                dt = (datetime.now() - t_start).total_seconds()
+                return res, dt
+
+            def run_b():
+                t_start = datetime.now()
+                res = run_model_tool_loop(provider=provider, messages=input_msgs, tools=openai_tools, model=model_b, max_tool_rounds=4)
+                dt = (datetime.now() - t_start).total_seconds()
+                return res, dt
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+                future_a = executor.submit(run_a)
+                future_b = executor.submit(run_b)
+                (res_a, dt_a) = future_a.result()
+                (res_b, dt_b) = future_b.result()
+
+            total_parallel_dt = (datetime.now() - t0).total_seconds()
+
+        st.toast(f"⚡ Parallel Execution Completed in {total_parallel_dt:.2f}s!")
+
+        col_res1, col_res2 = st.columns(2)
         with col_res1:
             st.markdown(f"### 🤖 Model A: `{model_a}`")
-            with st.spinner("Running Model A..."):
-                t0 = datetime.now()
-                res_a = run_model_tool_loop(provider=provider, messages=input_msgs, tools=openai_tools, model=model_a, max_tool_rounds=4)
-                dt_a = (datetime.now() - t0).total_seconds()
-                st.success(f"Execution Time: {dt_a:.2f}s | Status: {res_a['status']}")
-                render_perplexity_style_trace(res_a["rounds"])
-                st.markdown(res_a["assistant_text"])
+            st.success(f"Execution Time: {dt_a:.2f}s | Status: {res_a['status']}")
+            render_perplexity_style_trace(res_a["rounds"])
+            st.markdown(res_a["assistant_text"])
 
         with col_res2:
             st.markdown(f"### 🤖 Model B: `{model_b}`")
-            with st.spinner("Running Model B..."):
-                t0 = datetime.now()
-                res_b = run_model_tool_loop(provider=provider, messages=input_msgs, tools=openai_tools, model=model_b, max_tool_rounds=4)
-                dt_b = (datetime.now() - t0).total_seconds()
-                st.success(f"Execution Time: {dt_b:.2f}s | Status: {res_b['status']}")
-                render_perplexity_style_trace(res_b["rounds"])
-                st.markdown(res_b["assistant_text"])
+            st.success(f"Execution Time: {dt_b:.2f}s | Status: {res_b['status']}")
+            render_perplexity_style_trace(res_b["rounds"])
+            st.markdown(res_b["assistant_text"])
 
 with tab3:
     st.subheader("📂 Inspect Evaluation Runs & Transcripts")
